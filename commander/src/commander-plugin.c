@@ -345,7 +345,15 @@ store_populate_menu_items (GtkListStore  *store,
       } else {
         gchar *tmp;
         gchar *tooltip;
-        gchar *label = g_markup_printf_escaped ("<big>%s</big>", item_label);
+        gchar *basename = g_path_get_basename (item_label);
+        gchar *dirname = g_path_get_dirname (item_label);
+        gchar *dirname_basename = g_path_get_basename(dirname);
+        gchar *label;
+        if (g_strcmp0(".", dirname_basename)  == 0) {
+          label = g_markup_printf_escaped ("<big>%s</big>", basename);
+        } else {
+          label = g_markup_printf_escaped ("<big>%s/%s</big>", dirname_basename, basename);
+        }
 
         tooltip = gtk_widget_get_tooltip_markup (node->data);
         if (tooltip) {
@@ -365,6 +373,9 @@ store_populate_menu_items (GtkListStore  *store,
                                            -1);
 
         g_free (label);
+        g_free (basename);
+        g_free (dirname);
+        g_free (dirname_basename);
       }
 
       g_free (item_label);
@@ -410,8 +421,11 @@ fill_store (GtkListStore *store)
   /* open files */
   foreach_document (i) {
     gchar *basename = g_path_get_basename (DOC_FILENAME (documents[i]));
-    gchar *label = g_markup_printf_escaped ("<big>%s</big>\n"
+    gchar *dirname = g_path_get_dirname (DOC_FILENAME (documents[i]));
+    gchar *dirname_basename = g_path_get_basename(dirname);
+    gchar *label = g_markup_printf_escaped ("<big>%s/%s</big>\n"
                                             "<small><i>%s</i></small>",
+                                            dirname_basename,
                                             basename,
                                             DOC_FILENAME (documents[i]));
 
@@ -422,6 +436,8 @@ fill_store (GtkListStore *store)
                                        COL_DOCUMENT, documents[i],
                                        -1);
     g_free (basename);
+    g_free (dirname);
+    g_free (dirname_basename);
     g_free (label);
   }
 }
