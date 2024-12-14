@@ -675,9 +675,16 @@ create_panel (void)
   GtkTreeViewColumn  *col;
   GtkCellRenderer    *cell;
 
+  int window_width;
+  int window_height;
+  gtk_window_get_size(GTK_WINDOW(geany_data->main_widgets->window), &window_width, &window_height);
+  if (window_width >= 500) {
+    window_width = window_width / 2;
+  }
+
   plugin_data.panel = g_object_new (GTK_TYPE_WINDOW,
                                     "decorated", FALSE,
-                                    "default-width", 1000,
+                                    "default-width", window_width,
                                     "default-height", 200,
                                     "transient-for", geany_data->main_widgets->window,
                                     "window-position", GTK_WIN_POS_CENTER_ON_PARENT,
